@@ -1,16 +1,16 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore, type Firestore } from "firebase/firestore";
 
-// 1) En la consola de Firebase: Configuración del proyecto > Tus apps > App web.
-// 2) Copia los valores de firebaseConfig aquí.
-// Mientras apiKey diga "PEGA_AQUI", la app funciona en MODO LOCAL (guarda en el navegador).
+// Initialize Firebase
+
+import { initializeApp } from "firebase/app";
+import { getFirestore, type Firestore } from "firebase/firestore/lite";
+
 const firebaseConfig = {
-  apiKey: "PEGA_AQUI",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: "",
+  apiKey: "AIzaSyBz2Q92K64cUBWRVoZll7UDkTqUgr_EoaM",
+  authDomain: "softwarecity-98a98.firebaseapp.com",
+  projectId: "softwarecity-98a98",
+  storageBucket: "softwarecity-98a98.firebasestorage.app",
+  messagingSenderId: "996094468078",
+  appId: "1:996094468078:web:37265ca8bc3284fd62b8ff",
 };
 
 export const firebaseConfigurado = firebaseConfig.apiKey !== "PEGA_AQUI" && firebaseConfig.projectId !== "";

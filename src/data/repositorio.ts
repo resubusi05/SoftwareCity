@@ -1,6 +1,6 @@
 import {
   addDoc, collection, doc, getDoc, getDocs, orderBy, query, runTransaction, setDoc, type Firestore,
-} from "firebase/firestore";
+} from "firebase/firestore/lite";
 import { db, firebaseConfigurado } from "../firebase";
 import { ALUMNO_ID, ALUMNO_NOMBRE, PREGUNTAS_RETO, PUNTOS_RETO } from "../config";
 import { TEMAS } from "./contenido";
