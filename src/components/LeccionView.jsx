@@ -1,25 +1,16 @@
-import { useCallback, useEffect, useState, type ReactNode } from "react";
-import type { Leccion, ProgresoLeccion } from "../types";
+import { useCallback, useEffect, useState } from "react";
 import { alumnoRepo, contenido, mensajeError } from "../data/repositorio";
 import { BarraProgreso, Boton, Cargando, PanelError } from "./ui";
 
-type Props = {
-  leccionId: string;
-  color: string;
-  progreso?: ProgresoLeccion;
-  onGuardado: (p: ProgresoLeccion) => void;
-  onVolver: () => void;
-};
-
-type Pendiente = { progreso: ProgresoLeccion; despues: "salir" | "completar"; error: string };
+// pendiente: { progreso, despues: "salir" | "completar", error }
 
 // CDU-1 Estudiar tema: pasos 3–5, 9–10; A1 (salir); E1 (error al cargar); E3 (error al guardar)
-export default function LeccionView({ leccionId, color, progreso, onGuardado, onVolver }: Props) {
-  const [leccion, setLeccion] = useState<Leccion | null>(null);
-  const [errorCarga, setErrorCarga] = useState<string | null>(null);
+export default function LeccionView({ leccionId, color, progreso, onGuardado, onVolver }) {
+  const [leccion, setLeccion] = useState(null);
+  const [errorCarga, setErrorCarga] = useState(null);
   const [seccion, setSeccion] = useState(progreso && !progreso.completada ? progreso.seccion : 0);
   const [guardando, setGuardando] = useState(false);
-  const [pendiente, setPendiente] = useState<Pendiente | null>(null);
+  const [pendiente, setPendiente] = useState(null);
   const [terminada, setTerminada] = useState(false);
 
   const cargar = useCallback(async () => {
@@ -34,7 +25,7 @@ export default function LeccionView({ leccionId, color, progreso, onGuardado, on
 
   useEffect(() => { cargar(); }, [cargar]);
 
-  const guardar = async (p: ProgresoLeccion, despues: Pendiente["despues"]) => {
+  const guardar = async (p, despues) => {
     setGuardando(true);
     try {
       await alumnoRepo.guardarProgreso(p);
@@ -69,7 +60,7 @@ export default function LeccionView({ leccionId, color, progreso, onGuardado, on
 
   const total = leccion.secciones.length;
   const ultima = seccion === total - 1;
-  const base = (completada: boolean): ProgresoLeccion => ({
+  const base = (completada) => ({
     leccionId: leccion.id,
     temaId: leccion.temaId,
     seccion,
@@ -142,6 +133,6 @@ export default function LeccionView({ leccionId, color, progreso, onGuardado, on
   );
 }
 
-function Contenedor({ children }: { children: ReactNode }) {
+function Contenedor({ children }) {
   return <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">{children}</div>;
 }

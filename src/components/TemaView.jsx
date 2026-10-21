@@ -1,16 +1,7 @@
-import type { EstadoAlumno, TemaResumen } from "../types";
 import { Volver } from "./ui";
 
-type Props = {
-  tema: TemaResumen;
-  alumno: EstadoAlumno;
-  onLeccion: (leccionId: string) => void;
-  onEvaluacion: () => void;
-  onVolver: () => void;
-};
-
 // CDU-1 paso 2: lecciones del tema seleccionado (RF-NAV-02) + acceso a la evaluación (CDU-3)
-export default function TemaView({ tema, alumno, onLeccion, onEvaluacion, onVolver }: Props) {
+export default function TemaView({ tema, alumno, onLeccion, onEvaluacion, onVolver }) {
   const intentos = alumno.intentos.filter((i) => i.temaId === tema.id);
   const ultimo = intentos[0];
 
@@ -56,7 +47,7 @@ export default function TemaView({ tema, alumno, onLeccion, onEvaluacion, onVolv
                 <p className="text-xs text-secondary-foreground">{l.resumen}</p>
               </div>
               <span className="font-mono text-xs shrink-0" style={{ color: estado === "nueva" ? undefined : tema.color }}>
-                {estado === "completada" ? "COMPLETADA" : estado === "en-curso" ? `Sección ${p!.seccion + 1}/${l.numSecciones}` : "NUEVA"}
+                {estado === "completada" ? "COMPLETADA" : estado === "en-curso" ? `Sección ${p.seccion + 1}/${l.numSecciones}` : "NUEVA"}
               </span>
             </button>
           );

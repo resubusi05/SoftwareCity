@@ -1,32 +1,25 @@
-import { useCallback, useEffect, useState, type ReactNode } from "react";
-import type { RetoDelDia, RetoRegistro } from "../types";
+import { useCallback, useEffect, useState } from "react";
 import { alumnoRepo, borradorReto, contenido, ErrorConexion, ErrorRetoYaCompletado, mensajeError } from "../data/repositorio";
+import { calcularRecompensa } from "../config";
 import { BarraProgreso, Boton, Cargando, PanelError, Volver } from "./ui";
 
-type Props = {
-  retoHoy: RetoRegistro | null;
-  onRegistro: (r: RetoRegistro) => void;
-  onPuntos: (puntos: number) => void;
-  onVolver: () => void;
-};
+// Fases: "info" | "jugando" | "completado"
 
-type Fase = "info" | "jugando" | "completado";
-
-// CDU-2 Completar reto del día
-export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }: Props) {
-  const [reto, setReto] = useState<RetoDelDia | null>(null);
-  const [errorCarga, setErrorCarga] = useState<string | null>(null);
-  const [fase, setFase] = useState<Fase>(retoHoy?.completado ? "completado" : "info");
-  const [respuestas, setRespuestas] = useState<number[]>([]);
+// CDU-2 Completar reto del día (P-05 a P-08)
+export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }) {
+  const [reto, setReto] = useState(null);
+  const [errorCarga, setErrorCarga] = useState(null);
+  const [fase, setFase] = useState(retoHoy?.completado ? "completado" : "info");
+  const [respuestas, setRespuestas] = useState([]);
   const [actual, setActual] = useState(0);
-  const [elegida, setElegida] = useState<number | null>(null);
+  const [elegida, setElegida] = useState(null);
   const [enLinea, setEnLinea] = useState(navigator.onLine);
   const [registrando, setRegistrando] = useState(false);
-  const [errorRegistro, setErrorRegistro] = useState<string | null>(null);
+  const [errorRegistro, setErrorRegistro] = useState(null);
   const [yaCompletado, setYaCompletado] = useState(false);
   const [asignando, setAsignando] = useState(false);
-  const [errorRecompensa, setErrorRecompensa] = useState<string | null>(null);
-  const [recienGanados, setRecienGanados] = useState<number | null>(null);
+  const [errorRecompensa, setErrorRecompensa] = useState(null);
+  const [recienGanados, setRecienGanados] = useState(null);
 
   // RF-RT-01 / E1: cargar el reto del día
   const cargar = useCallback(async () => {
@@ -53,13 +46,22 @@ export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }: Pr
     return () => { window.removeEventListener("online", on); window.removeEventListener("offline", off); };
   }, []);
 
-  // RF-RT-04/05: registrar la finalización (E3 si falla, E5 si ya estaba completado)
-  const registrar = useCallback(async (resps: number[]) => {
+  // RF-RT-04/05 + RF-PRO-03: registrar la finalización con la recompensa proporcional a los aciertos
+  const registrar = useCallback(async (resps) => {
     if (!reto) return;
     setRegistrando(true);
     setErrorRegistro(null);
-    const registro: RetoRegistro = {
-      fecha: reto.fecha, temaId: reto.tema.id, respuestas: resps, completado: true, recompensa: reto.recompensa, recompensaAsignada: false,
+    const total = reto.preguntas.length;
+    const aciertos = reto.preguntas.reduce((a, p, i) => a + (resps[i] === p.correcta ? 1 : 0), 0);
+    const registro = {
+      fecha: reto.fecha,
+      temaId: reto.tema.id,
+      respuestas: resps,
+      aciertos,
+      total,
+      completado: true,
+      recompensa: calcularRecompensa(aciertos, total, reto.recompensaMaxima),
+      recompensaAsignada: false,
     };
     try {
       await alumnoRepo.registrarRetoCompletado(registro);
@@ -84,7 +86,7 @@ export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }: Pr
       const res = await alumnoRepo.asignarRecompensa(fecha);
       onPuntos(res.puntos);
       if (retoHoy) onRegistro({ ...retoHoy, recompensaAsignada: true });
-      if (!res.yaAsignada) setRecienGanados(retoHoy?.recompensa ?? reto?.recompensa ?? 0);
+      if (!res.yaAsignada) setRecienGanados(retoHoy?.recompensa ?? 0);
     } catch (e) {
       setErrorRecompensa(mensajeError(e));
     } finally {
@@ -117,7 +119,7 @@ export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }: Pr
   const color = reto.tema.color;
   const total = reto.preguntas.length;
 
-  // E5: el reto ya había sido completado
+  // P-08 · E1: el reto ya había sido completado
   if (yaCompletado) {
     return (
       <Contenedor>
@@ -130,9 +132,15 @@ export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }: Pr
     );
   }
 
+  // P-07 · pasos 6 a 10
   if (fase === "completado") {
     const registro = retoHoy;
     const asignada = registro?.recompensaAsignada;
+    const correctas = registro?.total ? (
+      <p className="font-mono text-xs text-muted-foreground">
+        {registro.aciertos} de {registro.total} correctas · máximo +{reto.recompensaMaxima} puntos
+      </p>
+    ) : null;
     return (
       <Contenedor>
         <div className="rounded-xl border border-primary/40 bg-card p-8 text-center space-y-4 neon-glow">
@@ -141,6 +149,7 @@ export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }: Pr
           {recienGanados !== null ? (
             <>
               <p className="font-display font-bold text-4xl text-neon-green">+{recienGanados} puntos</p>
+              {correctas}
               <p className="text-sm text-secondary-foreground">La recompensa se registró en tu perfil.</p>
               <Boton texto="Volver al inicio" onClick={onVolver} primaria />
             </>
@@ -153,7 +162,8 @@ export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }: Pr
           ) : (
             <>
               <p className="text-secondary-foreground">Recompensa obtenida:</p>
-              <p className="font-display font-bold text-4xl text-primary">+{registro?.recompensa ?? reto.recompensa} puntos</p>
+              <p className="font-display font-bold text-4xl text-primary">+{registro?.recompensa ?? 0} puntos</p>
+              {correctas}
               {errorRecompensa && (
                 <div className="rounded-lg border border-neon-orange/40 bg-neon-orange/10 p-3 text-sm text-foreground space-y-1">
                   <p className="font-semibold">Tu reto quedó completado, pero la recompensa está pendiente de asignar.</p>
@@ -174,6 +184,7 @@ export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }: Pr
     );
   }
 
+  // P-05 · pasos 2 y 3, A1
   if (fase === "info") {
     const continuar = respuestas.length > 0;
     return (
@@ -184,8 +195,8 @@ export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }: Pr
           <h1 className="font-display font-bold text-3xl text-foreground">Trivia rápida: {reto.tema.nombre}</h1>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <Dato titulo="Descripción" texto={`Responde ${total} preguntas del tema.`} />
-            <Dato titulo="Condición" texto="Contesta todas las preguntas. No importa si te equivocas." />
-            <Dato titulo="Recompensa" texto={`+${reto.recompensa} puntos`} destacado />
+            <Dato titulo="Condición" texto="Contesta todas las preguntas. Ganas puntos por cada respuesta correcta." />
+            <Dato titulo="Recompensa" texto={`Hasta +${reto.recompensaMaxima} puntos`} destacado />
           </div>
           {continuar && <p className="font-mono text-xs text-neon-green">Tienes un avance guardado: {respuestas.length}/{total} respondidas.</p>}
           <div className="flex gap-3">
@@ -197,12 +208,12 @@ export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }: Pr
     );
   }
 
-  // Fase jugando
+  // P-06 · pasos 4 y 5
   const pregunta = reto.preguntas[actual];
   const respondida = elegida !== null;
   const todas = respuestas.length >= total;
 
-  const elegir = (i: number) => {
+  const elegir = (i) => {
     if (respondida) return;
     setElegida(i);
     const nuevas = [...respuestas];
@@ -224,7 +235,7 @@ export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }: Pr
       )}
       <div className="flex justify-between text-xs font-mono text-muted-foreground">
         <span>Pregunta {actual + 1} / {total}</span>
-        <span className="text-primary">+{reto.recompensa} pts al terminar</span>
+        <span className="text-primary">hasta +{reto.recompensaMaxima} pts</span>
       </div>
       <BarraProgreso valor={(respuestas.filter((x) => x !== undefined && x !== null).length / total) * 100} color={color} />
 
@@ -284,7 +295,7 @@ export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }: Pr
   );
 }
 
-function Dato({ titulo, texto, destacado }: { titulo: string; texto: string; destacado?: boolean }) {
+function Dato({ titulo, texto, destacado }) {
   return (
     <div className="rounded-lg bg-muted border border-border p-3">
       <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{titulo}</p>
@@ -293,6 +304,6 @@ function Dato({ titulo, texto, destacado }: { titulo: string; texto: string; des
   );
 }
 
-function Contenedor({ children }: { children: ReactNode }) {
+function Contenedor({ children }) {
   return <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">{children}</div>;
 }

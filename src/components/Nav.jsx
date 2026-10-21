@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { modo, setSimularFallas } from "../data/repositorio";
+import { Avatar } from "./ui";
 
-type Props = { nombre: string; puntos: number; onInicio: () => void };
-
-export default function Nav({ nombre, puntos, onInicio }: Props) {
+export default function Nav({ nombre, puntos, onInicio }) {
   const [fallas, setFallas] = useState(false);
   const alternarFallas = () => {
     setSimularFallas(!fallas);
@@ -11,8 +10,8 @@ export default function Nav({ nombre, puntos, onInicio }: Props) {
   };
 
   return (
-    <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+    <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-[110]">
+      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3 sm:gap-4">
         <button onClick={onInicio} className="flex items-center gap-2 shrink-0">
           <div className="w-8 h-8 rounded bg-primary/20 border border-primary/40 flex items-center justify-center neon-glow">
             <span className="text-primary font-display font-bold text-sm">SC</span>
@@ -27,11 +26,12 @@ export default function Nav({ nombre, puntos, onInicio }: Props) {
         <button
           onClick={alternarFallas}
           title="Hace que las siguientes operaciones fallen, para mostrar el manejo de errores"
-          className={`px-2.5 py-1 rounded font-mono text-xs border transition-all ${
+          aria-label={fallas ? "Fallas ON" : "Simular fallas"}
+          className={`px-2.5 py-1 rounded font-mono text-xs border transition-all whitespace-nowrap ${
             fallas ? "border-neon-orange text-neon-orange bg-neon-orange/10" : "border-border text-muted-foreground hover:text-foreground"
           }`}
         >
-          {fallas ? "⚠ Fallas ON" : "🧪 Simular fallas"}
+          {fallas ? <>⚠<span className="hidden sm:inline"> Fallas ON</span></> : <>🧪<span className="hidden sm:inline"> Simular fallas</span></>}
         </button>
 
         <span
@@ -41,14 +41,12 @@ export default function Nav({ nombre, puntos, onInicio }: Props) {
           {modo === "firebase" ? "● FIREBASE" : "● MODO LOCAL"}
         </span>
 
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 font-display font-bold text-primary">
+        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 font-display font-bold text-primary whitespace-nowrap">
           ⚡ {puntos} <span className="text-xs font-mono font-normal">pts</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-accent/30 border border-accent/60 flex items-center justify-center text-sm font-display font-bold text-accent-foreground">
-            {nombre.charAt(0)}
-          </div>
+          <Avatar nombre={nombre} />
           <p className="hidden md:block text-xs font-semibold text-foreground">{nombre}</p>
         </div>
       </div>

@@ -1,29 +1,21 @@
-import { useCallback, useEffect, useState, type ReactNode } from "react";
-import type { EvaluacionCargada, IntentoEvaluacion } from "../types";
+import { useCallback, useEffect, useState } from "react";
 import { alumnoRepo, contenido, ErrorConexion, mensajeError } from "../data/repositorio";
 import { BarraProgreso, Boton, Cargando, Modal, PanelError, Volver } from "./ui";
 
-type Props = {
-  temaId: string;
-  intentosPrevios: IntentoEvaluacion[];
-  onIntento: (i: IntentoEvaluacion) => void;
-  onVolver: () => void;
-};
-
-type Fase = "info" | "respondiendo" | "resumen" | "resultado";
+// Fases: "info" | "respondiendo" | "resumen" | "resultado"
 
 // CDU-3 Realizar evaluación del tema
-export default function EvaluacionView({ temaId, intentosPrevios, onIntento, onVolver }: Props) {
-  const [ev, setEv] = useState<EvaluacionCargada | null>(null);
-  const [errorCarga, setErrorCarga] = useState<string | null>(null);
-  const [fase, setFase] = useState<Fase>("info");
-  const [respuestas, setRespuestas] = useState<(number | null)[]>([]);
+export default function EvaluacionView({ temaId, intentosPrevios, onIntento, onVolver }) {
+  const [ev, setEv] = useState(null);
+  const [errorCarga, setErrorCarga] = useState(null);
+  const [fase, setFase] = useState("info");
+  const [respuestas, setRespuestas] = useState([]);
   const [actual, setActual] = useState(0);
   const [confirmarSalida, setConfirmarSalida] = useState(false);
   const [avisoPendientes, setAvisoPendientes] = useState(false);
   const [enviando, setEnviando] = useState(false);
-  const [errorEnvio, setErrorEnvio] = useState<{ tipo: "conexion" | "registro"; mensaje: string } | null>(null);
-  const [resultado, setResultado] = useState<IntentoEvaluacion | null>(null);
+  const [errorEnvio, setErrorEnvio] = useState(null) // { tipo: "conexion" | "registro", mensaje };
+  const [resultado, setResultado] = useState(null);
 
   // RF-EV-01 / E1
   const cargar = useCallback(async () => {
@@ -57,14 +49,14 @@ export default function EvaluacionView({ temaId, intentosPrevios, onIntento, onV
   const color = tema.color;
   const total = preguntas.length;
   const pendientes = respuestas.map((r, i) => (r === null ? i : -1)).filter((i) => i >= 0);
-  const preguntaValida = (i: number) => preguntas[i].opciones.length >= 2; // E2
+  const preguntaValida = (i) => preguntas[i].opciones.length >= 2; // E2
 
   // RF-EV-06 (E3 conexión / E4 registro)
   const enviar = async () => {
     if (pendientes.length > 0) { setAvisoPendientes(true); return; } // A1
     if (preguntas.some((_, i) => !preguntaValida(i))) return; // E2: no se envía incompleta
     const aciertos = preguntas.reduce((a, p, i) => a + (respuestas[i] === p.correcta ? 1 : 0), 0);
-    const intento: IntentoEvaluacion = { temaId: tema.id, respuestas: respuestas as number[], aciertos, total, fecha: Date.now() };
+    const intento = { temaId: tema.id, respuestas: [...respuestas], aciertos, total, fecha: Date.now() };
     setEnviando(true);
     setErrorEnvio(null);
     try {
@@ -250,6 +242,6 @@ export default function EvaluacionView({ temaId, intentosPrevios, onIntento, onV
   );
 }
 
-function Contenedor({ children }: { children: ReactNode }) {
+function Contenedor({ children }) {
   return <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">{children}</div>;
 }

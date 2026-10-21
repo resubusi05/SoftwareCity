@@ -1,6 +1,4 @@
-import type { ReactNode } from "react";
-
-export function Cargando({ texto = "Cargando..." }: { texto?: string }) {
+export function Cargando({ texto = "Cargando..." }) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-20 text-muted-foreground">
       <div className="w-10 h-10 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
@@ -9,9 +7,8 @@ export function Cargando({ texto = "Cargando..." }: { texto?: string }) {
   );
 }
 
-type Accion = { texto: string; onClick: () => void; primaria?: boolean; deshabilitada?: boolean };
-
-export function Boton({ texto, onClick, primaria, deshabilitada, color }: Accion & { color?: string }) {
+/** Acción: { texto, onClick, primaria?, deshabilitada? } */
+export function Boton({ texto, onClick, primaria, deshabilitada, color }) {
   return (
     <button
       onClick={onClick}
@@ -29,7 +26,7 @@ export function Boton({ texto, onClick, primaria, deshabilitada, color }: Accion
 }
 
 /** Panel para excepciones de los casos de uso: informa y ofrece acciones (reintentar, regresar...). */
-export function PanelError({ titulo, mensaje, detalle, acciones }: { titulo: string; mensaje: string; detalle?: string; acciones: Accion[] }) {
+export function PanelError({ titulo, mensaje, detalle, acciones }) {
   return (
     <div className="rounded-xl border border-neon-orange/40 bg-card p-6 space-y-4 text-center">
       <div className="text-4xl">⚠️</div>
@@ -43,16 +40,16 @@ export function PanelError({ titulo, mensaje, detalle, acciones }: { titulo: str
   );
 }
 
-export function Modal({ abierto, children }: { abierto: boolean; children: ReactNode }) {
+export function Modal({ abierto, children, ancho = "max-w-sm" }) {
   if (!abierto) return null;
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4">
-      <div className="w-full max-w-sm rounded-xl border border-border bg-card p-6 space-y-4 text-center">{children}</div>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4" role="dialog" aria-modal="true">
+      <div className={`w-full ${ancho} rounded-xl border border-border bg-card p-6 space-y-4 text-center`}>{children}</div>
     </div>
   );
 }
 
-export function BarraProgreso({ valor, color }: { valor: number; color?: string }) {
+export function BarraProgreso({ valor, color }) {
   return (
     <div className="h-2 bg-muted rounded-full overflow-hidden">
       <div
@@ -63,10 +60,19 @@ export function BarraProgreso({ valor, color }: { valor: number; color?: string 
   );
 }
 
-export function Volver({ texto = "← Volver", onClick }: { texto?: string; onClick: () => void }) {
+export function Volver({ texto = "← Volver", onClick }) {
   return (
     <button onClick={onClick} className="text-muted-foreground hover:text-foreground transition-colors font-mono text-sm">
       {texto}
     </button>
+  );
+}
+
+/** Círculo con la inicial (alumno y amigos). */
+export function Avatar({ nombre, tamano = "w-8 h-8 text-sm", className = "" }) {
+  return (
+    <div className={`${tamano} rounded-full bg-accent/30 border border-accent/60 flex items-center justify-center font-display font-bold text-accent-foreground shrink-0 ${className}`}>
+      {nombre.replace(/^Amigo\s+/i, "").charAt(0).toUpperCase()}
+    </div>
   );
 }

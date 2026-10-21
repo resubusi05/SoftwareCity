@@ -1,9 +1,8 @@
-import type { Tema } from "../types";
 
 // CONTENIDO DE PRUEBA del Sprint 1 (Plan de iteración: "Preparar contenido de prueba del tema").
 // Para agregar temas, lecciones o preguntas, edita este arreglo.
 
-export const TEMAS: Tema[] = [
+export const TEMAS = [
   {
     id: "fundamentos",
     nombre: "Fundamentos de la Ingeniería de Software",
