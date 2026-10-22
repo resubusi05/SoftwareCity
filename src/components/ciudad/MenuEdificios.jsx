@@ -24,7 +24,7 @@ export default function MenuEdificios({ lote, lotes, puntos, operando, aviso, on
 
       <div className="flex-1 overflow-y-auto px-5 pb-5 space-y-5">
         {aviso && (
-          <div className="rounded-lg border border-neon-orange/40 bg-neon-orange/10 px-3 py-2 text-sm text-foreground" role="alert">{aviso}</div>
+          <div className="rounded-lg border border-aero-orange/40 bg-aero-orange/10 px-3 py-2 text-sm text-foreground" role="alert">{aviso}</div>
         )}
 
         <section className="space-y-2.5">

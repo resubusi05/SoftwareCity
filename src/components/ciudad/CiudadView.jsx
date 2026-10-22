@@ -104,12 +104,12 @@ export default function CiudadView({ alumno, onActualizar, onTutorialVisto, onRe
       {/* Barra de la pantalla */}
       <div className="border-b border-border bg-card/60 px-4 py-2.5 flex items-center gap-3 sm:gap-5">
         <button onClick={onVolver} className="font-mono text-sm text-muted-foreground hover:text-foreground">← Inicio</button>
-        <h1 className="font-display font-bold text-xl tracking-wide text-foreground">MI CIUDAD</h1>
+        <h1 className="font-display font-light text-2xl text-foreground">Mi ciudad</h1>
         <div className="flex-1" />
         <div className="hidden md:flex items-center gap-4 font-mono text-[11px] text-secondary-foreground">
-          <Leyenda clase="border border-dashed border-slate-500">Lote libre</Leyenda>
+          <Leyenda clase="border border-dashed border-white bg-green-200/70">Lote libre</Leyenda>
           <Leyenda clase="bg-secondary border border-border">Con edificio</Leyenda>
-          <Leyenda clase="bg-blue-700/70 border border-dashed border-blue-400">Seleccionado</Leyenda>
+          <Leyenda clase="bg-sky-400/70 border border-dashed border-sky-700">Seleccionado</Leyenda>
         </div>
       </div>
 
@@ -119,7 +119,7 @@ export default function CiudadView({ alumno, onActualizar, onTutorialVisto, onRe
           <EscenaCiudad lotes={lotes} interactiva seleccionado={seleccionado} resaltado={hecho?.loteId} zoom={zoom} giro={giro} onLote={tocarLote} />
 
           {hecho && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-2.5 rounded-xl border border-neon-green/60 bg-card/95 font-display font-bold text-foreground neon-glow-green whitespace-nowrap text-sm sm:text-base" role="status">
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-2.5 rounded-xl border border-aero-green/60 bg-card/95 font-display font-bold text-foreground aero-glow whitespace-nowrap text-sm sm:text-base" role="status">
               {hecho.texto}
             </div>
           )}
@@ -170,12 +170,12 @@ export default function CiudadView({ alumno, onActualizar, onTutorialVisto, onRe
 
       {/* P-19 · RNF-05: falla técnica al guardar. Reintentar usa el mismo idOperacion: no se cobra dos veces */}
       <Modal abierto={!!pendiente} ancho="max-w-md">
-        <div className="w-14 h-14 rounded-full border-2 border-neon-orange text-neon-orange font-display font-bold text-3xl flex items-center justify-center mx-auto">!</div>
+        <div className="w-14 h-14 rounded-full border-2 border-aero-orange text-aero-orange font-display font-bold text-3xl flex items-center justify-center mx-auto">!</div>
         <h2 className="font-display font-bold text-2xl text-foreground">No se pudo guardar el cambio</h2>
         <p className="text-sm text-secondary-foreground">
           {pendiente?.tipo === "comprar" ? "Tus puntos no se descontaron y tu ciudad quedó como estaba." : "Tu ciudad quedó como estaba."}
         </p>
-        {pendiente?.error && <p className="font-mono text-xs text-neon-orange">{pendiente.error}</p>}
+        {pendiente?.error && <p className="font-mono text-xs text-aero-orange">{pendiente.error}</p>}
         <div className="flex flex-wrap gap-3 justify-center">
           <button onClick={volverALaCiudad} disabled={!!operando} className="px-5 py-2.5 rounded-lg border border-border text-secondary-foreground font-display font-bold hover:text-foreground hover:bg-muted disabled:opacity-40">
             Volver a la ciudad

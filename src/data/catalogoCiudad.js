@@ -41,13 +41,13 @@ export const LOTES = [
  *         "/modelos/torre-requisitos.glb". Mientras sea null se dibuja una caja de relleno.
  */
 export const EDIFICIOS = [
-  { id: "kiosco-bugs", nombre: "Kiosco de Bugs", tamano: "chico", precio: 80, color: "#ff6b35", altura: 1.2, modelo: null },
-  { id: "caseta-versiones", nombre: "Caseta de Versiones", tamano: "chico", precio: 90, color: "#00ff88", altura: 1.8, modelo: null },
-  { id: "oficina-scrum", nombre: "Oficina Scrum", tamano: "mediano", precio: 100, color: "#7c3aed", altura: 2.6, modelo: null },
-  { id: "torre-requisitos", nombre: "Torre de Requisitos", tamano: "mediano", precio: 150, color: "#00d4ff", altura: 4.5, modelo: null },
+  { id: "kiosco-bugs", nombre: "Kiosco de Bugs", tamano: "chico", precio: 80, color: "#ff8a4c", altura: 1.2, modelo: null },
+  { id: "caseta-versiones", nombre: "Caseta de Versiones", tamano: "chico", precio: 90, color: "#46c765", altura: 1.8, modelo: null },
+  { id: "oficina-scrum", nombre: "Oficina Scrum", tamano: "mediano", precio: 100, color: "#9a86e8", altura: 2.6, modelo: null },
+  { id: "torre-requisitos", nombre: "Torre de Requisitos", tamano: "mediano", precio: 150, color: "#3fb6f0", altura: 4.5, modelo: null },
   { id: "laboratorio-pruebas", nombre: "Laboratorio de Pruebas", tamano: "mediano", precio: 180, color: "#f5c542", altura: 2.2, modelo: null },
   { id: "fabrica-codigo", nombre: "Fábrica de Código", tamano: "grande", precio: 220, color: "#3b82f6", altura: 2.4, modelo: null },
-  { id: "biblioteca-documentacion", nombre: "Biblioteca de Documentación", tamano: "grande", precio: 250, color: "#ec4899", altura: 3.2, modelo: null },
+  { id: "biblioteca-documentacion", nombre: "Biblioteca de Documentación", tamano: "grande", precio: 250, color: "#f27bb0", altura: 3.2, modelo: null },
 ];
 
 export const buscarLote = (id) => LOTES.find((l) => l.id === id) ?? null;

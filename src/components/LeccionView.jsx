@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { alumnoRepo, contenido, mensajeError } from "../data/repositorio";
 import { BarraProgreso, Boton, Cargando, PanelError } from "./ui";
+import ActividadSeccion from "./ActividadSeccion";
 
 // pendiente: { progreso, despues: "salir" | "completar", error }
 
@@ -12,6 +13,7 @@ export default function LeccionView({ leccionId, color, progreso, onGuardado, on
   const [guardando, setGuardando] = useState(false);
   const [pendiente, setPendiente] = useState(null);
   const [terminada, setTerminada] = useState(false);
+  const [ganados, setGanados] = useState(0); // puntos que dio completar la lección (0 si ya estaba completada)
 
   const cargar = useCallback(async () => {
     setErrorCarga(null);
@@ -28,8 +30,9 @@ export default function LeccionView({ leccionId, color, progreso, onGuardado, on
   const guardar = async (p, despues) => {
     setGuardando(true);
     try {
-      await alumnoRepo.guardarProgreso(p);
-      onGuardado(p);
+      const r = await alumnoRepo.guardarProgreso(p);
+      onGuardado(p, r);
+      setGanados(r?.puntosGanados ?? 0);
       setPendiente(null);
       if (despues === "salir") onVolver();
       else setTerminada(true);
@@ -87,11 +90,12 @@ export default function LeccionView({ leccionId, color, progreso, onGuardado, on
   if (terminada) {
     return (
       <Contenedor>
-        <div className="rounded-xl border bg-card p-8 text-center space-y-4 neon-glow-green" style={{ borderColor: "#00ff8866" }}>
+        <div className="rounded-xl border bg-card p-8 text-center space-y-4 aero-glow" style={{ borderColor: "#1fa34f88" }}>
           <div className="text-6xl animate-float">🎉</div>
           <h2 className="font-display font-bold text-3xl text-foreground">¡Lección completada!</h2>
           <p className="text-secondary-foreground">{leccion.titulo}</p>
-          <p className="font-mono text-xs text-neon-green">Tu progreso quedó registrado</p>
+          {ganados > 0 && <p className="font-display font-bold text-2xl text-aero-green">+{ganados} pts</p>}
+          <p className="font-mono text-xs text-aero-green">Tu progreso quedó registrado</p>
           <Boton texto="Volver a las lecciones" onClick={onVolver} primaria color={color} />
         </div>
       </Contenedor>
@@ -119,6 +123,7 @@ export default function LeccionView({ leccionId, color, progreso, onGuardado, on
         {s.parrafos.map((p, i) => (
           <p key={i} className="text-secondary-foreground leading-relaxed">{p}</p>
         ))}
+        {s.actividad && <ActividadSeccion key={`${leccion.id}-${seccion}`} actividad={s.actividad} color={color} />}
       </div>
 
       <div className="flex justify-between gap-3">

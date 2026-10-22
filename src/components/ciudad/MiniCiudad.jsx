@@ -26,13 +26,13 @@ export default function MiniCiudad({ lotes, className = "" }) {
 
   return (
     <svg viewBox={`${-w} ${-m * 2 * SIN * ESCALA - 50} ${w * 2} ${m * 4 * SIN * ESCALA + 60}`} className={className} aria-hidden="true">
-      <polygon points={puntos(base)} fill="rgba(0,212,255,0.06)" stroke="rgba(0,212,255,0.35)" strokeWidth="1" />
+      <polygon points={puntos(base)} fill="rgba(90,200,90,0.45)" stroke="rgba(255,255,255,0.85)" strokeWidth="1" />
       {ordenados.map((l) => {
         const edificioId = lotes?.[l.id];
         const e = edificioId ? buscarEdificio(edificioId) : null;
         const suelo = esquinas(l.x, l.z, l.ancho, l.fondo);
         if (!e) {
-          return <polygon key={l.id} points={puntos(suelo)} fill="none" stroke="rgba(148,163,184,0.45)" strokeWidth="0.8" strokeDasharray="3 2" />;
+          return <polygon key={l.id} points={puntos(suelo)} fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="0.8" strokeDasharray="3 2" />;
         }
         const ab = l.ancho * 0.8;
         const fb = l.fondo * 0.8;

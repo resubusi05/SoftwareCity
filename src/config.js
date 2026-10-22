@@ -1,6 +1,10 @@
-// Datos del alumno simulado (SRS 2.4: en este incremento no hay registro ni inicio de sesión).
-export const ALUMNO_ID = "alumno-demo";
-export const ALUMNO_NOMBRE = "Alumno Demo";
+// El alumno ya no es fijo: su id y nombre salen de la sesión (Google con Firebase; nombre en modo local).
+// Ver `sesion` y `usarSesion` en data/repositorio.js.
+
+// ---------- Lecciones (CDU-1) ----------
+// POR DEFINIR (valor de relleno): puntos que se ganan al completar una lección POR PRIMERA VEZ.
+// Repetir una lección ya completada no da puntos. Con 140, dos lecciones ya superan PUNTAJE_CIUDAD (200).
+export const PUNTOS_LECCION = 140;
 
 // ---------- Reto del día (CDU-2) ----------
 // Valores POR DEFINIR en la SRS. Cámbialos aquí cuando el equipo los decida.

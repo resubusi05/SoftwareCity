@@ -143,12 +143,12 @@ export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }) {
     ) : null;
     return (
       <Contenedor>
-        <div className="rounded-xl border border-primary/40 bg-card p-8 text-center space-y-4 neon-glow">
+        <div className="rounded-xl border border-primary/40 bg-card p-8 text-center space-y-4 aero-glow">
           <div className="text-6xl animate-float">🏆</div>
           <h2 className="font-display font-bold text-3xl text-foreground">¡Reto del día completado!</h2>
           {recienGanados !== null ? (
             <>
-              <p className="font-display font-bold text-4xl text-neon-green">+{recienGanados} puntos</p>
+              <p className="font-display font-bold text-4xl text-aero-green">+{recienGanados} puntos</p>
               {correctas}
               <p className="text-sm text-secondary-foreground">La recompensa se registró en tu perfil.</p>
               <Boton texto="Volver al inicio" onClick={onVolver} primaria />
@@ -165,9 +165,9 @@ export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }) {
               <p className="font-display font-bold text-4xl text-primary">+{registro?.recompensa ?? 0} puntos</p>
               {correctas}
               {errorRecompensa && (
-                <div className="rounded-lg border border-neon-orange/40 bg-neon-orange/10 p-3 text-sm text-foreground space-y-1">
+                <div className="rounded-lg border border-aero-orange/40 bg-aero-orange/10 p-3 text-sm text-foreground space-y-1">
                   <p className="font-semibold">Tu reto quedó completado, pero la recompensa está pendiente de asignar.</p>
-                  <p className="font-mono text-xs text-neon-orange">{errorRecompensa}</p>
+                  <p className="font-mono text-xs text-aero-orange">{errorRecompensa}</p>
                   <p className="text-xs text-muted-foreground">Se reintentará automáticamente al recuperar la conexión.</p>
                 </div>
               )}
@@ -198,7 +198,7 @@ export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }) {
             <Dato titulo="Condición" texto="Contesta todas las preguntas. Ganas puntos por cada respuesta correcta." />
             <Dato titulo="Recompensa" texto={`Hasta +${reto.recompensaMaxima} puntos`} destacado />
           </div>
-          {continuar && <p className="font-mono text-xs text-neon-green">Tienes un avance guardado: {respuestas.length}/{total} respondidas.</p>}
+          {continuar && <p className="font-mono text-xs text-aero-green">Tienes un avance guardado: {respuestas.length}/{total} respondidas.</p>}
           <div className="flex gap-3">
             <Boton texto="Ahora no" onClick={onVolver} />
             <Boton texto={continuar ? "Continuar reto →" : "Iniciar reto →"} onClick={() => setFase("jugando")} primaria color={color} />
@@ -229,7 +229,7 @@ export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }) {
   return (
     <Contenedor>
       {!enLinea && (
-        <div className="rounded-lg border border-neon-orange/40 bg-neon-orange/10 px-4 py-2 text-sm text-foreground">
+        <div className="rounded-lg border border-aero-orange/40 bg-aero-orange/10 px-4 py-2 text-sm text-foreground">
           📡 Se perdió la conexión. Tu avance se conserva y se sincronizará al restablecerse.
         </div>
       )}
@@ -269,8 +269,8 @@ export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }) {
           </div>
           {respondida && (
             <div className="rounded-lg p-4 text-sm border" style={{
-              background: elegida === pregunta.correcta ? "rgba(0,255,136,0.08)" : "rgba(255,107,53,0.08)",
-              borderColor: elegida === pregunta.correcta ? "rgba(0,255,136,0.3)" : "rgba(255,107,53,0.3)",
+              background: elegida === pregunta.correcta ? "rgba(80,200,110,0.22)" : "rgba(255,150,90,0.22)",
+              borderColor: elegida === pregunta.correcta ? "rgba(31,163,79,0.55)" : "rgba(224,88,15,0.55)",
             }}>
               <p className="font-semibold mb-1">{elegida === pregunta.correcta ? "✅ ¡Correcto!" : "❌ Incorrecto"}</p>
               <p className="text-secondary-foreground">{pregunta.explicacion}</p>
@@ -279,12 +279,12 @@ export default function RetoView({ retoHoy, onRegistro, onPuntos, onVolver }) {
           {respondida && (
             todas && actual === total - 1 ? (
               <button onClick={() => registrar(respuestas)} disabled={registrando}
-                className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-display font-bold tracking-wide neon-glow hover:brightness-110 disabled:opacity-50">
+                className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-display font-bold tracking-wide aero-glow hover:brightness-110 disabled:opacity-50">
                 {registrando ? "Registrando..." : "TERMINAR RETO ✓"}
               </button>
             ) : (
               <button onClick={siguiente}
-                className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-display font-bold tracking-wide neon-glow hover:brightness-110">
+                className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-display font-bold tracking-wide aero-glow hover:brightness-110">
                 SIGUIENTE →
               </button>
             )

@@ -1,0 +1,20 @@
+rules_version = '2';
+// Reglas de seguridad de Software City (RNF-02 Seguridad, SCS 6.4).
+// - Cada alumno lee y escribe SOLO sus propios datos (alumnos/{uid}/...), con su sesión de Google.
+// - Sin sesión no se lee ni se escribe nada.
+// - Todavía no hay "agregar amigo por código": la lista de amigos de CDU-12 es de prueba y no está en Firestore.
+//   Cuando exista, agregar aquí que los amigos puedan LEER (no escribir) alumnos/{uid}/ciudad/plano.
+// Limitación conocida: sin Cloud Functions el cliente calcula los puntos; estas reglas impiden tocar
+// datos ajenos, pero no validan que los puntos propios sean "justos".
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function esDueno(uid) { return request.auth != null && request.auth.uid == uid; }
+
+    match /alumnos/{uid} {
+      allow read, write: if esDueno(uid);
+      match /{subcoleccion}/{documento=**} {
+        allow read, write: if esDueno(uid);
+      }
+    }
+  }
+}

@@ -11,20 +11,20 @@ export default function TemaView({ tema, alumno, onLeccion, onEvaluacion, onVolv
 
       <div className="flex items-center gap-4">
         <div
-          className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl border"
-          style={{ background: `${tema.color}18`, borderColor: `${tema.color}40`, boxShadow: `0 0 16px ${tema.color}30` }}
+          className="icono-gel w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
+          style={{ "--c": tema.color }}
         >
           {tema.icono}
         </div>
         <div>
-          <h1 className="font-display font-bold text-2xl sm:text-3xl text-foreground tracking-wide">{tema.nombre}</h1>
+          <h1 className="font-display font-light text-3xl sm:text-4xl text-foreground">{tema.nombre}</h1>
           <p className="text-sm text-secondary-foreground">{tema.descripcion}</p>
         </div>
       </div>
 
       <div className="space-y-3">
         <h2 className="font-display font-bold text-lg text-foreground flex items-center gap-2">
-          <span style={{ color: tema.color }}>◆</span> LECCIONES
+          <span className="gema-aero" style={{ "--c": tema.color }} aria-hidden="true" /> Lecciones
         </h2>
         {tema.lecciones.map((l, i) => {
           const p = alumno.progreso[l.id];
@@ -37,8 +37,8 @@ export default function TemaView({ tema, alumno, onLeccion, onEvaluacion, onVolv
               style={{ borderColor: estado === "completada" ? `${tema.color}50` : undefined }}
             >
               <span
-                className="w-9 h-9 rounded-lg flex items-center justify-center font-display font-bold shrink-0"
-                style={{ background: `${tema.color}20`, color: tema.color }}
+                className="icono-gel w-9 h-9 rounded-lg flex items-center justify-center font-display font-bold shrink-0"
+                style={{ "--c": tema.color, color: tema.color }}
               >
                 {estado === "completada" ? "✓" : i + 1}
               </span>
@@ -47,7 +47,7 @@ export default function TemaView({ tema, alumno, onLeccion, onEvaluacion, onVolv
                 <p className="text-xs text-secondary-foreground">{l.resumen}</p>
               </div>
               <span className="font-mono text-xs shrink-0" style={{ color: estado === "nueva" ? undefined : tema.color }}>
-                {estado === "completada" ? "COMPLETADA" : estado === "en-curso" ? `Sección ${p.seccion + 1}/${l.numSecciones}` : "NUEVA"}
+                {estado === "completada" ? "Completada" : estado === "en-curso" ? `Sección ${p.seccion + 1}/${l.numSecciones}` : "Nueva"}
               </span>
             </button>
           );
@@ -63,14 +63,14 @@ export default function TemaView({ tema, alumno, onLeccion, onEvaluacion, onVolv
           {ultimo && (
             <div className="text-right">
               <p className="font-display font-bold text-xl" style={{ color: tema.color }}>{ultimo.aciertos}/{ultimo.total}</p>
-              <p className="font-mono text-[10px] text-muted-foreground">ÚLTIMO RESULTADO · {intentos.length} intento{intentos.length === 1 ? "" : "s"}</p>
+              <p className="font-mono text-[10px] text-muted-foreground">Último resultado · {intentos.length} intento{intentos.length === 1 ? "" : "s"}</p>
             </div>
           )}
         </div>
         <button
           onClick={onEvaluacion}
-          className="w-full py-3 rounded-lg font-display font-bold text-primary-foreground hover:brightness-110 transition-all"
-          style={{ background: tema.color }}
+          className="btn-aero w-full py-3 font-display font-bold hover:brightness-110 transition-all"
+          style={{ "--btn": tema.color }}
         >
           {ultimo ? "Realizar de nuevo" : "Realizar evaluación"} →
         </button>

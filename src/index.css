@@ -1,56 +1,83 @@
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 @import 'tailwindcss';
+
+/* ============================================================
+   Software City · Aero 7
+   Frutiger Aero estilo Windows Vista / 7 + reproductor de Windows Media:
+   cielo y pasto tipo "Bliss", burbujas, ventanas de vidrio con marco
+   translúcido, cromo plateado-azul y botones de gel.
+   Fuentes de sistema (Segoe UI), sin descargas externas ni WebGL en el fondo.
+   ============================================================ */
+
+html {
+  min-height: 100%;
+  background-color: #8fd3f4;
+  background-image: linear-gradient(180deg, #2f9fe8 0%, #6ec6f3 34%, #bfeafb 66%, #e4f8ee 100%);
+  background-attachment: fixed;
+}
 
 html,
 body,
 #root {
   height: 100%;
-  background-color: #080c18;
+}
+
+body,
+#root {
+  background: transparent;
 }
 
 @theme inline {
-  --color-background: #080c18;
-  --color-foreground: #e2e8f0;
-  --color-card: #0f1629;
-  --color-card-foreground: #e2e8f0;
-  --color-primary: #00d4ff;
-  --color-primary-foreground: #080c18;
-  --color-secondary: #1e2a4a;
-  --color-secondary-foreground: #94a3b8;
-  --color-muted: #131e35;
-  --color-muted-foreground: #64748b;
-  --color-accent: #7c3aed;
-  --color-accent-foreground: #ffffff;
-  --color-border: rgba(0, 212, 255, 0.12);
-  --color-ring: #00d4ff;
-  --color-neon-green: #00ff88;
-  --color-neon-orange: #ff6b35;
-  --font-display: 'Rajdhani', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --radius: 0.5rem;
+  --color-background: #cfeefb;
+  --color-foreground: #0c2d48;
+  --color-card: #ffffff;
+  --color-card-foreground: #0c2d48;
+  --color-primary: #0b72b8;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #d7edf9;
+  --color-secondary-foreground: #2f5673;
+  --color-muted: #d9ecf7;
+  --color-muted-foreground: #4a6a82;
+  --color-accent: #1f8f4e;
+  --color-accent-foreground: #0b3d24;
+  --color-border: rgba(30, 110, 170, 0.32);
+  --color-ring: #0b72b8;
+  --color-aero-green: #1c7f43;
+  --color-aero-orange: #c94a08;
+  --font-display: 'Segoe UI', 'Segoe UI Variable', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'Segoe UI', 'Segoe UI Variable', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'Segoe UI', 'Segoe UI Variable', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --radius: 0.75rem;
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border);
+  }
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 212, 255, 0.2) transparent;
+  scrollbar-color: rgba(11, 114, 184, 0.5) transparent;
 }
 
 *::-webkit-scrollbar {
-  width: 4px;
+  width: 10px;
 }
 *::-webkit-scrollbar-track {
-  background: transparent;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.55), rgba(215, 235, 248, 0.5));
+  border-radius: 8px;
 }
 *::-webkit-scrollbar-thumb {
-  background: rgba(0, 212, 255, 0.2);
-  border-radius: 2px;
+  background: linear-gradient(90deg, #cfe6f8, #7fbbe6 48%, #5aa4de 52%, #b4daf4);
+  border: 1px solid #5d8fb8;
+  border-radius: 8px;
 }
 
 body {
   font-family: var(--font-body);
   color: var(--color-foreground);
-  background-color: var(--color-background);
 }
 
 .font-display {
@@ -61,51 +88,378 @@ body {
   font-family: var(--font-mono);
 }
 
-.neon-glow {
-  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3), 0 0 60px rgba(0, 212, 255, 0.1);
+/* Windows 7 usaba minúsculas normales: se anulan las mayúsculas y el espaciado exagerado */
+.uppercase {
+  text-transform: none;
+}
+[class*='tracking-'] {
+  letter-spacing: 0;
 }
 
-.neon-glow-purple {
-  box-shadow: 0 0 20px rgba(124, 58, 237, 0.4), 0 0 60px rgba(124, 58, 237, 0.15);
+/* Títulos con el halo blanco de las ventanas Aero */
+h1,
+h2 {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85), 0 0 12px rgba(255, 255, 255, 0.5);
 }
 
-.neon-glow-green {
-  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3), 0 0 60px rgba(0, 255, 136, 0.1);
+/* ---------- Paisaje de fondo: rayos de sol, nubes, colina y burbujas ---------- */
+html::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: repeating-conic-gradient(from 192deg at 92% -6%, rgba(255, 255, 255, 0.2) 0 3deg, transparent 3deg 10deg);
+  -webkit-mask-image: radial-gradient(ellipse 85% 75% at 92% 0%, #000 0%, transparent 72%);
+  mask-image: radial-gradient(ellipse 85% 75% at 92% 0%, #000 0%, transparent 72%);
 }
 
-.text-glow {
-  text-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    /* nubes */
+    radial-gradient(ellipse 260px 70px at 14% 16%, rgba(255, 255, 255, 0.85), transparent 70%),
+    radial-gradient(ellipse 200px 56px at 22% 19%, rgba(255, 255, 255, 0.7), transparent 70%),
+    radial-gradient(ellipse 320px 80px at 62% 9%, rgba(255, 255, 255, 0.75), transparent 70%),
+    radial-gradient(ellipse 220px 60px at 70% 13%, rgba(255, 255, 255, 0.6), transparent 70%),
+    /* resplandor del sol */
+    radial-gradient(circle at 92% -4%, rgba(255, 255, 255, 0.95), rgba(255, 244, 190, 0.4) 16%, transparent 38%);
+}
+
+/* Colina de pasto (dos lomas con brillo de gel) */
+body::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 26vh;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 14% at 28% 8%, rgba(255, 255, 255, 0.4), transparent 70%),
+    radial-gradient(ellipse 85% 105% at 18% 108%, #62cf55 0 62%, transparent 62.4%),
+    radial-gradient(ellipse 95% 120% at 82% 112%, #38a640 0 60%, transparent 60.4%),
+    linear-gradient(180deg, transparent 0 40%, #2f9a3a 100%);
+  filter: drop-shadow(0 -8px 18px rgba(120, 220, 130, 0.35));
+  opacity: 0.95;
+}
+
+/* Burbujas flotando (se dibujan en App.jsx) */
+.aero-burbujas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.aero-burbujas i {
+  position: absolute;
+  bottom: -160px;
+  left: var(--x);
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 26%, rgba(255, 255, 255, 0.95) 0 7%, rgba(255, 255, 255, 0) 20%),
+    radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 30%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.04) 55%, rgba(150, 225, 255, 0.4) 76%, rgba(255, 255, 255, 0.8) 94%, rgba(255, 255, 255, 0.25) 100%);
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.55), 0 0 8px rgba(130, 215, 255, 0.45);
+  opacity: 0;
+  animation: burbuja var(--d) linear var(--r) infinite;
+}
+
+@keyframes burbuja {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  8% { opacity: 0.9; }
+  50% { transform: translate3d(18px, -55vh, 0); }
+  92% { opacity: 0.8; }
+  100% { transform: translate3d(-10px, -118vh, 0); opacity: 0; }
+}
+
+/* ---------- Vidrio: toda superficie "bg-card" ---------- */
+[class*='bg-card'] {
+  background-image:
+    linear-gradient(113deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.16) 33%, rgba(255, 255, 255, 0) 33.3%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.48) 55%, rgba(196, 234, 252, 0.5) 100%) !important;
+  background-color: transparent !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.5);
+  backdrop-filter: blur(14px) saturate(1.5);
+  box-shadow:
+    0 8px 24px rgba(10, 80, 140, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+/* ---------- Ventana Aero (marco de vidrio + barra de título + cuerpo) ---------- */
+.ventana-aero {
+  position: relative;
+  padding: 0 6px 6px;
+  border-radius: 10px;
+  background:
+    linear-gradient(113deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.14) 30%, rgba(255, 255, 255, 0) 30.3%),
+    linear-gradient(180deg, rgba(130, 198, 244, 0.7), rgba(66, 150, 216, 0.62));
+  border: 1px solid rgba(14, 62, 112, 0.6);
+  box-shadow:
+    0 12px 32px rgba(8, 60, 110, 0.38),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  -webkit-backdrop-filter: blur(12px) saturate(1.5);
+  backdrop-filter: blur(12px) saturate(1.5);
+}
+
+.ventana-aero__barra {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 0 0 0 6px;
+}
+
+.ventana-aero__icono {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  background: radial-gradient(circle at 35% 28%, #fff 0 14%, #7fd0ff 38%, #1479c4 100%);
+  border: 1px solid rgba(10, 60, 110, 0.6);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
+}
+
+.ventana-aero__titulo {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #082a47;
+  text-shadow: 0 0 10px #fff, 0 0 4px #fff, 0 0 2px #fff;
+}
+
+.ventana-aero__controles {
+  display: flex;
+  align-self: flex-start;
+  gap: 1px;
+  pointer-events: none;
+}
+
+.ventana-aero__controles span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 18px;
+  font-size: 11px;
+  line-height: 1;
+  color: #0a2a45;
+  border: 1px solid rgba(12, 58, 104, 0.65);
+  border-top: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(200, 226, 247, 0.65) 48%, rgba(120, 172, 218, 0.6) 52%, rgba(196, 228, 250, 0.8));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+}
+
+.ventana-aero__controles span:first-child {
+  border-bottom-left-radius: 5px;
+}
+
+.ventana-aero__controles span:last-child {
+  width: 44px;
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 -1px 0 rgba(90, 10, 0, 0.5);
+  border-bottom-right-radius: 5px;
+  background: linear-gradient(180deg, #f4b3a4 0%, #e0583f 48%, #c23a22 52%, #e98563 100%);
+}
+
+.ventana-aero__cuerpo {
+  border: 1px solid rgba(14, 62, 112, 0.5);
+  border-radius: 3px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(236, 247, 255, 0.93));
+  box-shadow: inset 0 1px 4px rgba(0, 60, 120, 0.18);
+  overflow: hidden;
+}
+
+/* Cuerpo "acuario" (como la visualización del reproductor): agua profunda con rayos de luz y burbujas */
+.agua-aero {
+  position: relative;
+  color: #fff;
+  border: 1px solid rgba(8, 40, 90, 0.7);
+  background:
+    radial-gradient(ellipse 45% 70% at 85% -15%, rgba(255, 255, 255, 0.4), transparent 70%),
+    repeating-conic-gradient(from 196deg at 84% -22%, rgba(255, 255, 255, 0.13) 0 3deg, transparent 3deg 9deg),
+    radial-gradient(circle at 12% 120%, rgba(110, 220, 255, 0.5), transparent 50%),
+    linear-gradient(180deg, #0a4894 0%, #1261b2 55%, #1877c4 100%);
+  box-shadow: inset 0 1px 6px rgba(0, 20, 60, 0.5);
+}
+
+.agua-aero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle closest-side at 32% 28%, rgba(255, 255, 255, 0.95) 0 14%, rgba(255, 255, 255, 0) 45%) 62% 18% / 34px 34px no-repeat,
+    radial-gradient(circle closest-side, rgba(255, 255, 255, 0.05) 55%, rgba(170, 230, 255, 0.35) 78%, rgba(255, 255, 255, 0.75) 96%, rgba(255, 255, 255, 0) 100%) 62% 18% / 34px 34px no-repeat,
+    radial-gradient(circle closest-side, rgba(255, 255, 255, 0.05) 55%, rgba(170, 230, 255, 0.35) 78%, rgba(255, 255, 255, 0.75) 96%, rgba(255, 255, 255, 0) 100%) 74% 66% / 20px 20px no-repeat,
+    radial-gradient(circle closest-side, rgba(255, 255, 255, 0.05) 55%, rgba(170, 230, 255, 0.35) 78%, rgba(255, 255, 255, 0.75) 96%, rgba(255, 255, 255, 0) 100%) 90% 36% / 12px 12px no-repeat;
+}
+
+.agua-aero > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Pastilla de dato (puntos, lecciones...) */
+.pastilla-aero {
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(224, 241, 253, 0.88) 50%, rgba(200, 228, 248, 0.88) 52%, rgba(236, 247, 255, 0.92));
+  box-shadow: 0 3px 10px rgba(0, 30, 80, 0.35), inset 0 1px 0 #fff;
+}
+
+/* ---------- Barra superior: cromo plateado-azul de reproductor ---------- */
+.barra-aero {
+  background:
+    linear-gradient(180deg, #fcfeff 0%, #e0edf9 44%, #bfd7ee 50%, #d6e7f6 100%);
+  border-bottom: 1px solid #5f8db6;
+  box-shadow: 0 3px 12px rgba(10, 70, 130, 0.3), inset 0 -1px 0 rgba(255, 255, 255, 0.85);
+}
+
+/* Orbe del logo (como el botón de inicio de Vista) */
+.orbe-logo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 40, 90, 0.8);
+  border: 1px solid #0a4f86;
+  background: radial-gradient(circle at 50% 115%, #7be0ff 0, #2aa0e6 40%, #0b5aa6 100%);
+  box-shadow: 0 2px 6px rgba(5, 60, 110, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.6), inset 0 -4px 8px rgba(120, 225, 255, 0.55);
+}
+
+.orbe-logo::before {
+  content: '';
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 4%;
+  height: 48%;
+  border-radius: 50% 50% 46% 46% / 70% 70% 30% 30%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.12));
+  pointer-events: none;
+}
+
+/* Campo "Ready" del reproductor: fondo blanco hundido con texto verde */
+.display-ready {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 12px;
+  border: 1px solid #86a7c4;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #f1f6fb, #fff 40%);
+  box-shadow: inset 0 1px 3px rgba(0, 50, 100, 0.25);
+  color: #1c8a3a;
+  font-weight: 700;
+}
+
+/* ---------- Orbes de gel (avatares) ---------- */
+.orbe-gel {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--c), #000 55%);
+  border: 1px solid color-mix(in srgb, var(--c), #000 35%);
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 118%, color-mix(in srgb, var(--c), #fff 60%) 0, transparent 70%),
+    linear-gradient(180deg, color-mix(in srgb, var(--c), #fff 30%) 0%, var(--c) 52%, color-mix(in srgb, var(--c), #000 22%) 100%);
+  box-shadow:
+    0 2px 6px color-mix(in srgb, var(--c), transparent 55%),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+}
+
+.orbe-gel::before {
+  content: '';
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  top: 5%;
+  height: 46%;
+  border-radius: 50% 50% 45% 45% / 75% 75% 25% 25%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.1));
+  pointer-events: none;
+}
+
+/* Cuadro de ícono de tema (cuadrado de gel con el color del tema) */
+.icono-gel {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--c), #000 25%);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--c), #fff 78%) 0%, color-mix(in srgb, var(--c), #fff 55%) 50%, color-mix(in srgb, var(--c), #fff 35%) 52%, color-mix(in srgb, var(--c), #fff 62%) 100%);
+  box-shadow:
+    0 3px 8px color-mix(in srgb, var(--c), transparent 60%),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+/* Gema de título de sección */
+.gema-aero {
+  display: inline-block;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--c), #000 35%);
+  background: radial-gradient(circle at 35% 28%, #fff 0 12%, color-mix(in srgb, var(--c), #fff 45%) 36%, var(--c) 70%, color-mix(in srgb, var(--c), #000 25%) 100%);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--c), transparent 40%);
+}
+
+/* ---------- Brillo / glow ---------- */
+.aero-glow {
+  box-shadow:
+    0 6px 18px rgba(11, 127, 199, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.aero-text {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9), 0 0 14px rgba(110, 200, 255, 0.55);
 }
 
 .grid-bg {
   background-image:
-    linear-gradient(rgba(0, 212, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 212, 255, 0.04) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.35) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
 .card-hover {
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .card-hover:hover {
-  transform: translateY(-2px);
-  border-color: rgba(0, 212, 255, 0.4);
+  transform: translateY(-3px);
+  border-color: rgba(11, 114, 184, 0.7);
+  box-shadow:
+    0 14px 30px rgba(10, 80, 140, 0.28),
+    0 0 18px rgba(120, 210, 255, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
-.scanline {
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.03) 2px,
-    rgba(0, 0, 0, 0.03) 4px
-  );
-}
-
-@keyframes pulse-neon {
+@keyframes pulse-soft {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+  50% { opacity: 0.65; }
 }
 
 @keyframes float {
@@ -113,26 +467,152 @@ body {
   50% { transform: translateY(-6px); }
 }
 
-@keyframes scan {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
-}
-
-.animate-pulse-neon {
-  animation: pulse-neon 2s ease-in-out infinite;
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
 }
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
 
+/* ---------- Botón glossy tipo gota/píldora (color con --btn) ---------- */
+.btn-aero,
+button[class~='bg-primary'],
+button[class~='bg-aero-green'] {
+  --btn: #1479c4;
+  position: relative;
+  overflow: hidden;
+  color: #fff !important;
+  background-color: var(--btn) !important;
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--btn), #fff 42%) 0%,
+    var(--btn) 48%,
+    color-mix(in srgb, var(--btn), #000 24%) 52%,
+    color-mix(in srgb, var(--btn), #8fe0ff 18%) 100%
+  ) !important;
+  border: 1px solid color-mix(in srgb, var(--btn), #000 35%);
+  border-radius: 999px;
+  text-shadow: 0 -1px 0 rgba(0, 30, 70, 0.55);
+  box-shadow:
+    0 4px 12px color-mix(in srgb, var(--btn), transparent 55%),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+    inset 0 -2px 5px rgba(130, 225, 255, 0.35);
+  transition: filter 0.15s ease, box-shadow 0.15s ease;
+}
+
+button[class~='bg-aero-green'] {
+  --btn: #2a9d3f;
+}
+
+.btn-aero:hover,
+button[class~='bg-primary']:hover,
+button[class~='bg-aero-green']:hover {
+  filter: brightness(1.08) saturate(1.1);
+  box-shadow:
+    0 4px 16px color-mix(in srgb, var(--btn), transparent 35%),
+    0 0 14px rgba(140, 225, 255, 0.8),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.75);
+}
+
+.btn-aero::before,
+button[class~='bg-primary']::before,
+button[class~='bg-aero-green']::before {
+  content: '';
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: 2px;
+  height: 46%;
+  border-radius: 999px 999px 40% 40%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.12));
+  pointer-events: none;
+}
+
+/* Botón secundario: plateado de Windows 7 */
+button[class~='border-border']:not(:disabled) {
+  color: #12395a;
+  border: 1px solid #6f97bd;
+  border-radius: 8px;
+  background-image: linear-gradient(180deg, #fdfeff 0%, #e6f0fb 46%, #cbdff1 50%, #e8f3fc 100%) !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow: 0 1px 3px rgba(10, 70, 130, 0.3), inset 0 1px 0 #fff;
+  transition: box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+button[class~='border-border']:not(:disabled):hover {
+  filter: brightness(1.03);
+  border-color: #2a8bd0;
+  box-shadow: 0 1px 3px rgba(10, 70, 130, 0.3), 0 0 10px rgba(110, 205, 255, 0.85), inset 0 1px 0 #fff;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #ffb03a;
+  outline-offset: 2px;
+}
+
+/* Campos de texto: hundidos, con brillo azul al enfocar */
+input[type='text'],
+input:not([type]) {
+  background: linear-gradient(180deg, #eef5fb, #fff 40%) !important;
+  border: 1px solid #7fa3c3 !important;
+  border-radius: 4px !important;
+  box-shadow: inset 0 1px 3px rgba(0, 50, 100, 0.25);
+}
+
+input[type='text']:focus,
+input:not([type]):focus {
+  border-color: #2a8bd0 !important;
+  box-shadow: inset 0 1px 3px rgba(0, 50, 100, 0.2), 0 0 0 3px rgba(80, 180, 240, 0.35);
+}
+
+/* ---------- Barra de progreso: control deslizante del reproductor ---------- */
+.slider-aero {
+  position: relative;
+}
+
+.slider-aero__pista {
+  height: 12px;
+  overflow: hidden;
+  border: 1px solid #7fa3c3;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #cfe0ee, #fff 70%);
+  box-shadow: inset 0 1px 3px rgba(0, 50, 100, 0.3);
+}
+
+.slider-aero__perilla {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 18px;
+  margin-top: -9px;
+  border: 1px solid #5d8fb8;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #fdfeff, #d6e8f7 48%, #a9cdea 52%, #dbeefb);
+  box-shadow: 0 1px 3px rgba(0, 50, 100, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+}
+
 .progress-bar {
-  background: linear-gradient(90deg, #00d4ff, #7c3aed);
-  box-shadow: 0 0 8px rgba(0, 212, 255, 0.4);
+  position: relative;
+  background-image: linear-gradient(180deg, #9be67f 0%, #46bb4c 50%, #2a9a3d 52%, #5ecb5e 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 0 8px rgba(70, 190, 90, 0.5);
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 1px;
+  height: 40%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.05));
 }
 
 .district-locked {
-  filter: grayscale(0.7) brightness(0.5);
+  filter: grayscale(0.7) brightness(0.9) opacity(0.7);
 }
 
 .trivia-option {
@@ -141,17 +621,31 @@ body {
 }
 
 .trivia-option:hover {
-  background: rgba(0, 212, 255, 0.1);
-  border-color: rgba(0, 212, 255, 0.5);
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(11, 114, 184, 0.7);
 }
 
 .trivia-correct {
-  background: rgba(0, 255, 136, 0.15) !important;
-  border-color: #00ff88 !important;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+  background: rgba(120, 220, 130, 0.35) !important;
+  border-color: #2a9a3d !important;
+  box-shadow: 0 0 14px rgba(70, 190, 90, 0.4);
 }
 
 .trivia-wrong {
-  background: rgba(255, 107, 53, 0.15) !important;
-  border-color: #ff6b35 !important;
+  background: rgba(255, 170, 120, 0.35) !important;
+  border-color: #d9540b !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aero-burbujas i {
+    animation: none;
+    opacity: 0.7;
+    bottom: var(--fija, 20%);
+  }
+  .card-hover,
+  .animate-float,
+  .animate-pulse-soft {
+    animation: none;
+    transition: none;
+  }
 }

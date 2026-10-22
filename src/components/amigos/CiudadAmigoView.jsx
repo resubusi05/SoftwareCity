@@ -20,7 +20,7 @@ export default function CiudadAmigoView({ amigo, lotes, onSalir }) {
           <h1 className="font-display font-bold text-lg sm:text-xl text-foreground truncate">Ciudad de {amigo.nombre}</h1>
           <p className="font-mono text-[11px] text-muted-foreground">{ocupados} edificio{ocupados === 1 ? "" : "s"}</p>
         </div>
-        <span className="px-2 py-0.5 rounded border border-foreground/60 font-mono text-[11px] tracking-widest text-foreground">SOLO VISITA</span>
+        <span className="px-2 py-0.5 rounded-full border border-primary/50 bg-white/60 text-xs font-semibold text-primary">Solo visita</span>
         <div className="flex-1" />
         {/* Paso 6: salir de la ciudad. Paso 7: regresa a la lista de amigos */}
         <button onClick={onSalir} className="px-4 py-2.5 rounded-lg border border-border text-foreground font-display font-bold hover:bg-muted whitespace-nowrap">

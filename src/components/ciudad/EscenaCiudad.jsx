@@ -17,16 +17,21 @@ import { buscarEdificio, LOTES, TAMANO_PLANO } from "../../data/catalogoCiudad";
 export default function EscenaCiudad({ lotes, interactiva = false, seleccionado = null, resaltado = null, zoom = 1, giro = 0, onLote }) {
   return (
     <Canvas orthographic dpr={[1, 2]} camera={{ position: [21, 26, 21], zoom: 30, near: 0.1, far: 200 }} className="touch-none">
-      <color attach="background" args={["#0b1222"]} />
-      <ambientLight intensity={0.75} />
-      <directionalLight position={[12, 22, 8]} intensity={1.4} />
-      <directionalLight position={[-10, 8, -6]} intensity={0.35} />
+      <color attach="background" args={["#bfe8fb"]} />
+      <ambientLight intensity={1.25} color="#f4fbff" />
+      <directionalLight position={[12, 22, 8]} intensity={1.7} color="#fff3d2" />
+      <directionalLight position={[-10, 8, -6]} intensity={0.4} color="#bfe0ff" />
       <Camara zoom={zoom} giro={giro} />
 
       {/* Suelo del plano */}
       <mesh position={[0, -0.2, 0]}>
         <boxGeometry args={[TAMANO_PLANO + 1, 0.4, TAMANO_PLANO + 1]} />
-        <meshStandardMaterial color="#131e35" />
+        <meshStandardMaterial color="#6fd16a" />
+      </mesh>
+      {/* Capa de tierra bajo el pasto */}
+      <mesh position={[0, -0.55, 0]}>
+        <boxGeometry args={[TAMANO_PLANO + 1.4, 0.7, TAMANO_PLANO + 1.4]} />
+        <meshStandardMaterial color="#9a7448" />
       </mesh>
 
       {LOTES.map((lote) => {
@@ -87,9 +92,9 @@ function Lote({ lote, edificio, interactiva, seleccionado, resaltado, onLote }) 
     ? () => { setEncima(false); document.body.style.cursor = ""; }
     : undefined;
 
-  let relleno = libre ? "#0f1629" : "#1e2a4a";
-  if (interactiva && encima) relleno = "#1b2b52";
-  if (seleccionado) relleno = "#1d4ed8";
+  let relleno = libre ? "#a8e8a0" : "#eaf8ff";
+  if (interactiva && encima) relleno = "#c8ffc0";
+  if (seleccionado) relleno = "#38bdf8";
 
   return (
     <group position={[lote.x, 0, lote.z]}>
@@ -99,7 +104,7 @@ function Lote({ lote, edificio, interactiva, seleccionado, resaltado, onLote }) 
       </mesh>
       <Line
         points={borde}
-        color={seleccionado ? "#60a5fa" : "#64748b"}
+        color={seleccionado ? "#0284c7" : "#ffffff"}
         lineWidth={seleccionado ? 2.5 : 1.2}
         dashed
         dashSize={0.35}
@@ -124,10 +129,10 @@ function EtiquetaLote({ texto, seleccionado }) {
     lienzo.width = 128;
     lienzo.height = 64;
     const ctx = lienzo.getContext("2d");
-    ctx.font = "bold 40px 'JetBrains Mono', ui-monospace, monospace";
+    ctx.font = "bold 40px 'Segoe UI', system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillStyle = seleccionado ? "#bfdbfe" : "#94a3b8";
+    ctx.fillStyle = seleccionado ? "#075985" : "#2f7a3a";
     ctx.fillText(texto, 64, 34);
     const t = new CanvasTexture(lienzo);
     t.colorSpace = SRGBColorSpace;
@@ -162,7 +167,7 @@ function CajaEdificio({ edificio, ancho, fondo, resaltado }) {
     <mesh position={[0, edificio.altura / 2, 0]}>
       <boxGeometry args={[ancho, edificio.altura, fondo]} />
       <meshStandardMaterial color={edificio.color} roughness={0.55} metalness={0.1} />
-      <Edges color={resaltado ? "#ffffff" : "#0b1222"} lineWidth={resaltado ? 3 : 1} />
+      <Edges color={resaltado ? "#ffffff" : "#35607f"} lineWidth={resaltado ? 3 : 1} />
     </mesh>
   );
 }

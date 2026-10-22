@@ -1,7 +1,7 @@
 // AMIGOS DE PRUEBA (CDU-12).
-// Igual que el alumno simulado (alumno-demo), en este incremento no hay inicio de sesión ni caso de uso
-// para agregar amigos por código, así que la lista de amigos y sus ciudades son datos de prueba.
-// Cuando exista el login con Google y el caso de uso de agregar amigo, amigosRepo leerá esto de Firestore.
+// Ya hay inicio de sesión, pero todavía no existe el caso de uso para agregar amigos por código, así que la
+// lista de amigos y sus ciudades siguen siendo datos de prueba (iguales para cualquier cuenta).
+// Cuando exista "agregar amigo", amigosRepo leerá esto de Firestore.
 //
 // Casos que cubren:
 //   Amigo A: ciudad con varios edificios (flujo normal)

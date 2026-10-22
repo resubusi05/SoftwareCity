@@ -12,7 +12,7 @@ export default function Tutorial({ abierto, onCerrar }) {
   return (
     <Modal abierto={abierto} ancho="max-w-lg">
       <div className="text-left space-y-5">
-        <p className="font-mono text-[11px] uppercase tracking-widest text-neon-green">Tutorial · primera vez</p>
+        <p className="font-mono text-[11px] uppercase tracking-widest text-aero-green">Tutorial · primera vez</p>
         <h2 className="font-display font-bold text-2xl text-foreground">Así diseñas tu ciudad</h2>
         <ol className="space-y-4">
           {PASOS.map((p, i) => (
@@ -25,7 +25,7 @@ export default function Tutorial({ abierto, onCerrar }) {
         </ol>
         <div className="flex justify-end gap-3 pt-1">
           <button onClick={onCerrar} className="px-5 py-2.5 rounded-lg border border-border text-secondary-foreground font-display font-bold hover:text-foreground hover:bg-muted">Saltar</button>
-          <button onClick={onCerrar} className="px-5 py-2.5 rounded-lg bg-neon-green text-primary-foreground font-display font-bold hover:brightness-110">Empezar →</button>
+          <button onClick={onCerrar} className="px-5 py-2.5 rounded-lg bg-aero-green text-primary-foreground font-display font-bold hover:brightness-110">Empezar →</button>
         </div>
       </div>
     </Modal>

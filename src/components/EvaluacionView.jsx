@@ -80,7 +80,7 @@ export default function EvaluacionView({ temaId, intentosPrevios, onIntento, onV
       <p className="text-sm text-secondary-foreground">Tus respuestas no se guardarán y la evaluación no quedará como completada.</p>
       <div className="flex gap-3 justify-center">
         <Boton texto="Seguir respondiendo" onClick={() => setConfirmarSalida(false)} />
-        <Boton texto="Sí, salir" onClick={onVolver} primaria color="#ff6b35" />
+        <Boton texto="Sí, salir" onClick={onVolver} primaria color="#e0580f" />
       </div>
     </Modal>
   );
@@ -116,12 +116,12 @@ export default function EvaluacionView({ temaId, intentosPrevios, onIntento, onV
     const pct = Math.round((resultado.aciertos / resultado.total) * 100);
     return (
       <Contenedor>
-        <div className="rounded-xl border bg-card p-8 text-center space-y-4 neon-glow" style={{ borderColor: `${color}60` }}>
+        <div className="rounded-xl border bg-card p-8 text-center space-y-4 aero-glow" style={{ borderColor: `${color}60` }}>
           <div className="text-6xl animate-float">{pct >= 80 ? "🏆" : pct >= 60 ? "⭐" : "📚"}</div>
           <h2 className="font-display font-bold text-2xl text-foreground">Resultado de la evaluación</h2>
           <p className="font-display font-bold text-6xl" style={{ color }}>{resultado.aciertos}/{resultado.total}</p>
           <p className="text-secondary-foreground">respuestas correctas</p>
-          <p className="font-mono text-xs text-neon-green">Tu intento quedó registrado</p>
+          <p className="font-mono text-xs text-aero-green">Tu intento quedó registrado</p>
           <div className="flex gap-3 justify-center">
             <Boton texto="Regresar al tema" onClick={onVolver} primaria color={color} />
           </div>
@@ -142,7 +142,7 @@ export default function EvaluacionView({ temaId, intentosPrevios, onIntento, onV
           <h2 className="font-display font-bold text-2xl text-foreground">Revisa antes de enviar</h2>
           <p className="text-sm text-secondary-foreground">{total - pendientes.length} de {total} preguntas respondidas.</p>
           {avisoPendientes && pendientes.length > 0 && (
-            <div className="rounded-lg border border-neon-orange/40 bg-neon-orange/10 p-3 text-sm text-foreground">
+            <div className="rounded-lg border border-aero-orange/40 bg-aero-orange/10 p-3 text-sm text-foreground">
               No puedes enviar la evaluación: faltan por responder las preguntas {pendientes.map((i) => i + 1).join(", ")}.
             </div>
           )}
@@ -153,7 +153,7 @@ export default function EvaluacionView({ temaId, intentosPrevios, onIntento, onV
                 <button key={i} onClick={() => { setActual(i); setFase("respondiendo"); }}
                   className="h-10 rounded-lg font-mono text-sm font-bold border transition-all hover:brightness-125"
                   style={falta
-                    ? { borderColor: avisoPendientes ? "#ff6b35" : "var(--color-border)", color: avisoPendientes ? "#ff6b35" : "var(--color-muted-foreground)" }
+                    ? { borderColor: avisoPendientes ? "#e0580f" : "var(--color-border)", color: avisoPendientes ? "#e0580f" : "var(--color-muted-foreground)" }
                     : { borderColor: `${color}80`, background: `${color}20`, color }}>
                   {i + 1}
                 </button>
@@ -219,7 +219,7 @@ export default function EvaluacionView({ temaId, intentosPrevios, onIntento, onV
                   className="trivia-option w-full text-left px-4 py-3 rounded-lg border bg-muted/50 text-sm text-foreground flex items-center gap-3"
                   style={sel ? { borderColor: color, background: `${color}20`, boxShadow: `0 0 12px ${color}30` } : { borderColor: "var(--color-border)" }}>
                   <span className="w-6 h-6 rounded shrink-0 flex items-center justify-center font-mono text-xs font-bold border"
-                    style={{ borderColor: sel ? color : "rgba(255,255,255,0.15)", color: sel ? color : undefined }}>
+                    style={{ borderColor: sel ? color : "rgba(30,110,170,0.3)", color: sel ? color : undefined }}>
                     {String.fromCharCode(65 + i)}
                   </span>
                   {op}

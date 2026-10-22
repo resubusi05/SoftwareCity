@@ -1,8 +1,9 @@
 import {
   addDoc, collection, doc, getDoc, getDocs, orderBy, query, runTransaction, setDoc,
 } from "firebase/firestore";
-import { db, firebaseConfigurado } from "../firebase";
-import { ALUMNO_ID, ALUMNO_NOMBRE, PREGUNTAS_RETO, PUNTAJE_CIUDAD, PUNTOS_RETO } from "../config";
+import { onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut } from "firebase/auth";
+import { auth, db, firebaseConfigurado, proveedorGoogle } from "../firebase";
+import { PREGUNTAS_RETO, PUNTAJE_CIUDAD, PUNTOS_LECCION, PUNTOS_RETO } from "../config";
 import { TEMAS } from "./contenido";
 import { buscarEdificio, buscarLote, cabeEnLote } from "./catalogoCiudad";
 import { AMIGOS_DEMO, CIUDADES_DEMO } from "./amigosDemo";
@@ -10,6 +11,8 @@ import { AMIGOS_DEMO, CIUDADES_DEMO } from "./amigosDemo";
 // ---------- Errores ----------
 export class ErrorConexion extends Error {}
 export class ErrorRetoYaCompletado extends Error {}
+export class ErrorValidacion extends Error {}
+export class ErrorSinSesion extends Error {}
 // Ciudad (CDU-10): reglas que se revisan dentro de la transacción
 export class ErrorPuntosInsuficientes extends Error {}
 export class ErrorLoteOcupado extends Error {}
@@ -43,6 +46,64 @@ export function nuevoIdOperacion() {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+// ---------- Sesión (inicio de sesión del alumno) ----------
+// Con Firebase: cuenta de Google (Firebase Authentication). En modo local: solo el nombre, guardado en este navegador.
+const CLAVE_SESION = "softwarecity:sesion";
+const oyentesLocal = new Set();
+const leerSesionLocal = () => {
+  try { return JSON.parse(localStorage.getItem(CLAVE_SESION) ?? "null"); } catch { return null; }
+};
+/** "María Pérez" -> "maria-perez". En modo local el mismo nombre recupera el mismo progreso. */
+const idLocalDeNombre = (n) =>
+  n.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+export const sesion = {
+  /** Llama a cb({ uid, nombre }) o cb(null) cada vez que cambia la sesión. Regresa la función para dejar de escuchar. */
+  observar(cb) {
+    if (auth) {
+      return onAuthStateChanged(auth, (u) => cb(u ? { uid: u.uid, nombre: u.displayName || u.email || "Alumno" } : null));
+    }
+    oyentesLocal.add(cb);
+    cb(leerSesionLocal());
+    return () => oyentesLocal.delete(cb);
+  },
+  entrarConGoogle: () =>
+    ejecutar(async () => {
+      try {
+        await signInWithPopup(auth, proveedorGoogle);
+      } catch (e) {
+        if (e?.code === "auth/popup-blocked") await signInWithRedirect(auth, proveedorGoogle);
+        else if (e?.code === "auth/popup-closed-by-user" || e?.code === "auth/cancelled-popup-request") throw new Error("Cerraste la ventana de Google antes de terminar.");
+        else if (e?.code === "auth/network-request-failed") throw new ErrorConexion("Sin conexión a internet.");
+        else throw e;
+      }
+    }, 60000),
+  entrarLocal: (nombre) =>
+    ejecutar(async () => {
+      const limpio = (nombre ?? "").trim().replace(/\s+/g, " ").slice(0, 40);
+      const id = idLocalDeNombre(limpio);
+      if (limpio.length < 2 || id.length < 2) throw new ErrorValidacion("Escribe tu nombre (mínimo 2 letras).");
+      const s = { uid: `local-${id}`, nombre: limpio };
+      localStorage.setItem(CLAVE_SESION, JSON.stringify(s));
+      oyentesLocal.forEach((cb) => cb(s));
+      return s;
+    }),
+  cerrar: async () => {
+    if (auth) { await signOut(auth); return; }
+    localStorage.removeItem(CLAVE_SESION);
+    oyentesLocal.forEach((cb) => cb(null));
+  },
+};
+
+let uid = null;
+let nombreSesion = "Alumno";
+/** App llama esto cuando cambia la sesión, antes de cargar al alumno. */
+export function usarSesion(s) {
+  uid = s?.uid ?? null;
+  nombreSesion = s?.nombre ?? "Alumno";
+}
+const exigirSesion = () => { if (!uid) throw new ErrorSinSesion("No has iniciado sesión."); };
+
 // ---------- Fechas ----------
 export function hoyISO() {
   const d = new Date();
@@ -63,6 +124,13 @@ function buscarTema(id) {
   const t = temasDisponibles().find((x) => x.id === id);
   if (!t) throw new Error("El tema no está disponible.");
   return t;
+}
+
+/** Del banco del tema se toman PREGUNTAS_RETO preguntas distintas cada día, en rotación (el mismo día siempre sale lo mismo). */
+function preguntasDelDia(banco, dia) {
+  if (banco.length <= PREGUNTAS_RETO) return banco;
+  const inicio = (dia * PREGUNTAS_RETO) % banco.length;
+  return Array.from({ length: PREGUNTAS_RETO }, (_, k) => banco[(inicio + k) % banco.length]);
 }
 
 export const contenido = {
@@ -91,7 +159,7 @@ export const contenido = {
       const temas = temasDisponibles().filter((t) => t.reto.length > 0);
       const dia = Math.floor(new Date(fecha + "T00:00:00").getTime() / 86400000);
       const t = temas[dia % temas.length];
-      return { fecha, tema: resumir(t), preguntas: t.reto.slice(0, PREGUNTAS_RETO), recompensaMaxima: PUNTOS_RETO };
+      return { fecha, tema: resumir(t), preguntas: preguntasDelDia(t.reto, dia), recompensaMaxima: PUNTOS_RETO };
     }),
 };
 
@@ -127,20 +195,24 @@ function validarMovimiento(lotes, origenId, destinoId) {
 // Las dos implementaciones (Firebase y local) deben comportarse igual (SCS 11).
 
 // ----- Firebase (Firestore) -----
-// Estructura:
-//   alumnos/{alumnoId}                       -> { nombre, puntos, ciudadDesbloqueada, tutorialCiudadVisto }
-//   alumnos/{alumnoId}/progresoLecciones/{leccionId}
-//   alumnos/{alumnoId}/intentosEvaluacion/{autoId}
-//   alumnos/{alumnoId}/retos/{AAAA-MM-DD}
-//   alumnos/{alumnoId}/ciudad/plano           -> { lotes: { L7: "torre-requisitos" }, ultimaOperacion, actualizado }
+// Estructura ({uid} = id de la cuenta de Google que inició sesión):
+//   alumnos/{uid}                       -> { nombre, puntos, ciudadDesbloqueada, tutorialCiudadVisto }
+//   alumnos/{uid}/progresoLecciones/{leccionId}
+//   alumnos/{uid}/intentosEvaluacion/{autoId}
+//   alumnos/{uid}/retos/{AAAA-MM-DD}
+//   alumnos/{uid}/ciudad/plano           -> { lotes: { L7: "torre-requisitos" }, ultimaOperacion, actualizado }
 function backendFirebase(fs) {
-  const alumnoRef = doc(fs, "alumnos", ALUMNO_ID);
-  const planoRef = doc(alumnoRef, "ciudad", "plano");
+  // Las referencias se arman en cada llamada porque el uid cambia al iniciar o cerrar sesión
+  const refAlumno = () => { exigirSesion(); return doc(fs, "alumnos", uid); };
+  const refPlano = () => doc(refAlumno(), "ciudad", "plano");
   return {
     async cargarAlumno() {
+      const alumnoRef = refAlumno();
+      const planoRef = refPlano();
       const snap = await getDoc(alumnoRef);
-      if (!snap.exists()) await setDoc(alumnoRef, { nombre: ALUMNO_NOMBRE, puntos: 0 });
-      const datos = snap.exists() ? snap.data() : { nombre: ALUMNO_NOMBRE, puntos: 0 };
+      // Primer ingreso: se crea el alumno con el nombre de su cuenta de Google
+      if (!snap.exists()) await setDoc(alumnoRef, { nombre: nombreSesion, puntos: 0 });
+      const datos = snap.exists() ? snap.data() : { nombre: nombreSesion, puntos: 0 };
       const [prog, ints, reto, plano] = await Promise.all([
         getDocs(collection(alumnoRef, "progresoLecciones")),
         getDocs(query(collection(alumnoRef, "intentosEvaluacion"), orderBy("fecha", "desc"))),
@@ -150,7 +222,7 @@ function backendFirebase(fs) {
       const progreso = {};
       prog.forEach((d) => { progreso[d.id] = d.data(); });
       return {
-        nombre: datos.nombre ?? ALUMNO_NOMBRE,
+        nombre: datos.nombre ?? nombreSesion,
         puntos: datos.puntos ?? 0,
         progreso,
         intentos: ints.docs.map((d) => d.data()),
@@ -160,14 +232,32 @@ function backendFirebase(fs) {
         lotes: plano.exists() ? plano.data().lotes ?? {} : {},
       };
     },
+    // Devuelve { puntosGanados, puntos }. Al completar la lección por primera vez se suman PUNTOS_LECCION
+    // en la misma transacción que guarda el progreso, así un reintento no los paga dos veces.
     async guardarProgreso(p) {
-      await setDoc(doc(alumnoRef, "progresoLecciones", p.leccionId), p);
+      const alumnoRef = refAlumno();
+      const progRef = doc(alumnoRef, "progresoLecciones", p.leccionId);
+      if (!p.completada) {
+        await setDoc(progRef, p);
+        return { puntosGanados: 0 };
+      }
+      return runTransaction(fs, async (tx) => {
+        const [prev, a] = [await tx.get(progRef), await tx.get(alumnoRef)];
+        const puntos = a.data()?.puntos ?? 0;
+        if (prev.exists() && prev.data().completada) { tx.set(progRef, p); return { puntosGanados: 0, puntos }; }
+        const nuevos = puntos + PUNTOS_LECCION;
+        tx.set(progRef, p);
+        const cambios = { puntos: nuevos };
+        if (nuevos >= PUNTAJE_CIUDAD) cambios.ciudadDesbloqueada = true;
+        tx.set(alumnoRef, cambios, { merge: true });
+        return { puntosGanados: PUNTOS_LECCION, puntos: nuevos };
+      });
     },
     async registrarIntento(i) {
-      await addDoc(collection(alumnoRef, "intentosEvaluacion"), i);
+      await addDoc(collection(refAlumno(), "intentosEvaluacion"), i);
     },
     async registrarRetoCompletado(r) {
-      const ref = doc(alumnoRef, "retos", r.fecha);
+      const ref = doc(refAlumno(), "retos", r.fecha);
       await runTransaction(fs, async (tx) => {
         const s = await tx.get(ref);
         if (s.exists() && s.data().completado) throw new ErrorRetoYaCompletado("Ya completaste el reto de hoy.");
@@ -175,6 +265,7 @@ function backendFirebase(fs) {
       });
     },
     async asignarRecompensa(fecha) {
+      const alumnoRef = refAlumno();
       const retoRef = doc(alumnoRef, "retos", fecha);
       return runTransaction(fs, async (tx) => {
         const [s, a] = [await tx.get(retoRef), await tx.get(alumnoRef)];
@@ -183,7 +274,7 @@ function backendFirebase(fs) {
         if (s.data().recompensaAsignada) return { yaAsignada: true, puntos };
         const nuevos = puntos + s.data().recompensa;
         tx.update(retoRef, { recompensaAsignada: true });
-        const cambios = { nombre: ALUMNO_NOMBRE, puntos: nuevos };
+        const cambios = { puntos: nuevos };
         if (nuevos >= PUNTAJE_CIUDAD) cambios.ciudadDesbloqueada = true; // CDU-10 E1: se desbloquea y ya no se vuelve a ocultar
         tx.set(alumnoRef, cambios, { merge: true });
         return { yaAsignada: false, puntos: nuevos };
@@ -191,6 +282,8 @@ function backendFirebase(fs) {
     },
     // CDU-10: descontar puntos y guardar el edificio en UNA transacción (SCS 7.4)
     async comprarEdificio({ loteId, edificioId, idOperacion }) {
+      const alumnoRef = refAlumno();
+      const planoRef = refPlano();
       return runTransaction(fs, async (tx) => {
         const [a, p] = [await tx.get(alumnoRef), await tx.get(planoRef)];
         const puntos = a.data()?.puntos ?? 0;
@@ -205,6 +298,7 @@ function backendFirebase(fs) {
       });
     },
     async moverEdificio({ origenId, destinoId, idOperacion }) {
+      const planoRef = refPlano();
       return runTransaction(fs, async (tx) => {
         const p = await tx.get(planoRef);
         const lotes = p.exists() ? { ...(p.data().lotes ?? {}) } : {};
@@ -215,25 +309,25 @@ function backendFirebase(fs) {
       });
     },
     async marcarTutorialVisto() {
-      await setDoc(alumnoRef, { tutorialCiudadVisto: true }, { merge: true });
+      await setDoc(refAlumno(), { tutorialCiudadVisto: true }, { merge: true });
     },
   };
 }
 
 // ----- Local (navegador) -----
-const CLAVE = `softwarecity:${ALUMNO_ID}`;
+const clave = () => { exigirSesion(); return `softwarecity:${uid}`; };
 function leer() {
   const vacio = {
-    nombre: ALUMNO_NOMBRE, puntos: 0, progreso: {}, intentos: [], retos: {},
+    nombre: nombreSesion, puntos: 0, progreso: {}, intentos: [], retos: {},
     ciudadDesbloqueada: false, tutorialCiudadVisto: false, lotes: {}, ultimaOperacion: null,
   };
   try {
-    const raw = localStorage.getItem(CLAVE);
+    const raw = localStorage.getItem(clave());
     if (raw) return { ...vacio, ...JSON.parse(raw) };
   } catch { /* datos corruptos: se reinicia */ }
   return vacio;
 }
-const escribir = (a) => localStorage.setItem(CLAVE, JSON.stringify(a));
+const escribir = (a) => localStorage.setItem(clave(), JSON.stringify(a));
 
 const backendLocal = {
   async cargarAlumno() {
@@ -245,7 +339,19 @@ const backendLocal = {
       ciudadDesbloqueada: a.ciudadDesbloqueada, tutorialCiudadVisto: a.tutorialCiudadVisto, lotes: a.lotes,
     };
   },
-  async guardarProgreso(p) { const a = leer(); a.progreso[p.leccionId] = p; escribir(a); },
+  async guardarProgreso(p) {
+    const a = leer();
+    const yaCompletada = !!a.progreso[p.leccionId]?.completada;
+    a.progreso[p.leccionId] = p;
+    let puntosGanados = 0;
+    if (p.completada && !yaCompletada) {
+      puntosGanados = PUNTOS_LECCION;
+      a.puntos += PUNTOS_LECCION;
+      if (a.puntos >= PUNTAJE_CIUDAD) a.ciudadDesbloqueada = true;
+    }
+    escribir(a);
+    return { puntosGanados, puntos: a.puntos };
+  },
   async registrarIntento(i) { const a = leer(); a.intentos.push(i); escribir(a); },
   async registrarRetoCompletado(r) {
     const a = leer();
@@ -304,7 +410,8 @@ export const ciudadRepo = {
 };
 
 // ---------- Amigos (CDU-12) ----------
-// Datos de prueba en ambos modos (ver amigosDemo.js). Pasan por ejecutar() para que las fallas
+// Datos de prueba en ambos modos (ver amigosDemo.js). Aunque ya hay inicio de sesión, "agregar amigo por código"
+// todavía no existe, así que la lista sigue siendo de prueba y no depende de la cuenta. Pasan por ejecutar() para que las fallas
 // simuladas y la falta de conexión se comporten igual que el resto (RNF-05).
 export const amigosRepo = {
   cargarAmigos: () => ejecutar(async () => AMIGOS_DEMO.map((a) => ({ ...a }))),
@@ -320,7 +427,7 @@ export const amigosRepo = {
 };
 
 // ---------- Borrador del reto (RF-RT-10: conservar avance si se pierde la conexión) ----------
-const claveBorrador = (fecha) => `softwarecity:reto-borrador:${ALUMNO_ID}:${fecha}`;
+const claveBorrador = (fecha) => `softwarecity:reto-borrador:${uid ?? "sin-sesion"}:${fecha}`;
 export const borradorReto = {
   leer(fecha) {
     try { return JSON.parse(localStorage.getItem(claveBorrador(fecha)) ?? "[]"); } catch { return []; }

@@ -4,7 +4,7 @@ import { Avatar, Boton, Modal, Volver } from "../ui";
 
 // CDU-12 Visitar ciudad de amigo
 //   P-20 lista de amigos (pasos 1 a 3) · P-22 amigo sin ciudad (E1)
-// La lista viene de amigosRepo (amigos de prueba mientras no haya login ni caso de uso para agregarlos).
+// La lista viene de amigosRepo (amigos de prueba mientras no exista el caso de uso para agregarlos).
 export default function AmigosView({ amigos, onVisitar, onVolver }) {
   const [cargando, setCargando] = useState(null); // id del amigo cuya ciudad se está cargando
   const [sinCiudad, setSinCiudad] = useState(null); // amigo -> P-22
@@ -53,9 +53,9 @@ export default function AmigosView({ amigos, onVisitar, onVolver }) {
       )}
 
       {falla && (
-        <div className="rounded-xl border border-neon-orange/40 bg-card p-5 space-y-3 text-center" role="alert">
+        <div className="rounded-xl border border-aero-orange/40 bg-card p-5 space-y-3 text-center" role="alert">
           <p className="font-display font-bold text-lg text-foreground">No se pudo cargar la ciudad de {falla.amigo.nombre}</p>
-          <p className="font-mono text-xs text-neon-orange">{falla.error}</p>
+          <p className="font-mono text-xs text-aero-orange">{falla.error}</p>
           <div className="flex gap-3 justify-center">
             <Boton texto="Reintentar" onClick={() => visitar(falla.amigo)} primaria deshabilitada={!!cargando} />
             <Boton texto="Cerrar" onClick={() => setFalla(null)} />
